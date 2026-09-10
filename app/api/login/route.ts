@@ -28,13 +28,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Too many attempts. Try again in 15 minutes." }, { status: 429 });
   }
 
-  if (!pinMatches(pin)) {
+  const who = pinMatches(pin);
+  if (who === null) {
     return NextResponse.json({ error: "That PIN is not right." }, { status: 401 });
   }
 
   await clearLoginAttempts(ip);
-  const res = NextResponse.json({ ok: true });
-  res.cookies.set(COOKIE, makeToken({ name: "", iat: Date.now() }), cookieOptions());
+  const res = NextResponse.json({ ok: true, name: who });
+  res.cookies.set(COOKIE, makeToken({ name: who, iat: Date.now() }), cookieOptions());
   res.headers.set("Cache-Control", "no-store");
   return res;
 }

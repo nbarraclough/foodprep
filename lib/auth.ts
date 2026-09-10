@@ -58,18 +58,29 @@ export function cookieOptions() {
   };
 }
 
-/** Constant-time comparison of the submitted passphrase with the configured one. */
-export function pinMatches(submitted: string): boolean {
-  const pin = process.env.HOUSEHOLD_PIN ?? "";
-  if (!pin) return false;
-  const a = Buffer.from(submitted.normalize("NFKC"), "utf8");
-  const b = Buffer.from(pin.normalize("NFKC"), "utf8");
-  if (a.length !== b.length) {
-    // still burn comparable time
-    timingSafeEqual(b, b);
-    return false;
+/**
+ * PINs come from `PINS` as `Name=1234,Other=5678`. `HOUSEHOLD_PIN` (no name) still works as a fallback.
+ * Returns the matching name, "" for the shared PIN, or null. Every candidate is compared so timing
+ * does not reveal which one matched.
+ */
+export function pinMatches(submitted: string): string | null {
+  const candidates: { name: string; pin: string }[] = [];
+  for (const entry of (process.env.PINS ?? "").split(",")) {
+    const eq = entry.indexOf("=");
+    if (eq < 1) continue;
+    const name = entry.slice(0, eq).trim();
+    const pin = entry.slice(eq + 1).trim();
+    if (name && pin) candidates.push({ name, pin });
   }
-  return timingSafeEqual(a, b);
+  if (process.env.HOUSEHOLD_PIN) candidates.push({ name: "", pin: process.env.HOUSEHOLD_PIN });
+  const a = Buffer.from(submitted.normalize("NFKC"), "utf8");
+  let matched: string | null = null;
+  for (const c of candidates) {
+    const b = Buffer.from(c.pin.normalize("NFKC"), "utf8");
+    const ok = a.length === b.length ? timingSafeEqual(a, b) : (timingSafeEqual(b, b), false);
+    if (ok && matched === null) matched = c.name;
+  }
+  return matched;
 }
 
 export const KEY_RE = /^[a-z0-9][a-z0-9:-]{0,79}$/;

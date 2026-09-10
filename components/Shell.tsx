@@ -60,7 +60,7 @@ function isCurrent(path: string, href: string) {
   return href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
 }
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({ name, children }: { name: string; children: ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const { status, lastSync } = useSync();
@@ -109,9 +109,16 @@ export function Shell({ children }: { children: ReactNode }) {
               <span className="dot" aria-hidden />
               <span className="small">{statusText}</span>
             </span>
-            <button type="button" className="linkbtn small" onClick={logout}>
-              Sign out
-            </button>
+            <span className="who" title={name ? `Signed in as ${name}` : undefined}>
+              {name && (
+                <span className="avatar" aria-label={name}>
+                  {name[0].toUpperCase()}
+                </span>
+              )}
+              <button type="button" className="linkbtn small" onClick={logout}>
+                Sign out
+              </button>
+            </span>
           </div>
         </div>
       </header>

@@ -7,8 +7,8 @@ Live at https://foodprep.butcherscott.com (household PIN required).
 ## How it works
 
 - Next.js app on Vercel. Recipe data lives in `lib/source-data.ts`; edit it and redeploy.
-- Ticks are stored in a Neon Postgres table (`ticks`) and polled every 4 seconds while the tab is open. 
-- Sign-in is a shared 4-digit PIN (`HOUSEHOLD_PIN`), entered on a tap keypad or the keyboard. No names, no accounts. The session is an HMAC-signed HttpOnly cookie (`SESSION_SECRET`). Sign-in attempts are rate-limited per IP.
+- Ticks are stored in a Neon Postgres table (`ticks`) and polled every 4 seconds while the tab is open. Each tick records who made it.
+- Sign-in is a 4-digit PIN on a tap keypad (or the keyboard). Each person has their own PIN, set in the `PINS` env var as `Nick=1234,Caity=5678`, so ticks show who made them. `HOUSEHOLD_PIN` still works as a shared PIN with no name. The session is an HMAC-signed HttpOnly cookie (`SESSION_SECRET`). Sign-in attempts are rate-limited per IP.
 - `/print` lets you choose what goes on paper: shopping list (optionally only unbought items), any set of recipe cards and which parts of them, cook days, reheat guide.
 - Kitchen mode makes the type bigger and keeps the screen awake. Any step with a duration gets a one-tap timer.
 
@@ -20,12 +20,11 @@ vercel env pull .env.local   # DATABASE_URL, HOUSEHOLD_PIN, SESSION_SECRET
 pnpm dev
 ```
 
-## Changing the PIN
+## Changing a PIN
 
 ```sh
-vercel env rm HOUSEHOLD_PIN production
-vercel env add HOUSEHOLD_PIN production
-git commit --allow-empty -m "Redeploy" && git push
+vercel env add PINS production --value "Nick=1234,Caity=5678" --force --sensitive
+git commit --allow-empty -m "Redeploy" && git push   # or press Redeploy in the Vercel dashboard
 ```
 
 Deploys go through the GitHub connection. Commits must be authored as nick@barraclough.nz (the GitHub account linked to the Vercel team) or Vercel blocks them.

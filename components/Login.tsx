@@ -68,14 +68,14 @@ export function Login() {
         <div>
           <h1>The October Freezer</h1>
           <p className="muted" style={{ marginTop: 6 }}>
-            Enter the household PIN once on each device. Ticks sync between them.
+            Enter your PIN once on each device. Ticks sync between them and show who made them.
           </p>
         </div>
 
 
         <div className="pinblock">
           <div className="pinhead">
-            <span>Household PIN</span>
+            <span>Your PIN</span>
             <button type="button" className="linkbtn small" onClick={() => pinInput.current?.focus()}>
               Use the keyboard
             </button>
@@ -93,7 +93,7 @@ export function Login() {
             inputMode="numeric"
             pattern="[0-9]*"
             autoComplete="one-time-code"
-            aria-label={`${LEN}-digit household PIN`}
+            aria-label={`${LEN}-digit PIN`}
             value={pin}
             onChange={(e) => onType(e.target.value)}
             maxLength={LEN}

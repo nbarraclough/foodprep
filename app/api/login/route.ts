@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { COOKIE, cleanName, cookieOptions, makeToken, pinMatches } from "@/lib/auth";
+import { COOKIE, cookieOptions, makeToken, pinMatches } from "@/lib/auth";
 import { clearLoginAttempts, recordLoginAttempt } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -17,10 +17,9 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
-  const { pin, name } = (body ?? {}) as { pin?: unknown; name?: unknown };
-  const cleaned = cleanName(name);
-  if (typeof pin !== "string" || pin.length === 0 || pin.length > 128 || !cleaned) {
-    return NextResponse.json({ error: "Enter your name and the household passphrase." }, { status: 400 });
+  const { pin } = (body ?? {}) as { pin?: unknown };
+  if (typeof pin !== "string" || pin.length === 0 || pin.length > 128) {
+    return NextResponse.json({ error: "Enter the household PIN." }, { status: 400 });
   }
 
   const ip = clientIp(req);
@@ -30,12 +29,12 @@ export async function POST(req: Request) {
   }
 
   if (!pinMatches(pin)) {
-    return NextResponse.json({ error: "That passphrase is not right." }, { status: 401 });
+    return NextResponse.json({ error: "That PIN is not right." }, { status: 401 });
   }
 
   await clearLoginAttempts(ip);
-  const res = NextResponse.json({ ok: true, name: cleaned });
-  res.cookies.set(COOKIE, makeToken({ name: cleaned, iat: Date.now() }), cookieOptions());
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(COOKIE, makeToken({ name: "", iat: Date.now() }), cookieOptions());
   res.headers.set("Cache-Control", "no-store");
   return res;
 }

@@ -72,12 +72,4 @@ export function pinMatches(submitted: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-/** Display names: letters, spaces, hyphens, apostrophes; 1–24 chars. */
-export function cleanName(raw: unknown): string | null {
-  if (typeof raw !== "string") return null;
-  const s = raw.normalize("NFKC").trim().replace(/\s+/g, " ");
-  if (!/^[\p{L}][\p{L} '\-]{0,23}$/u.test(s)) return null;
-  return s;
-}
-
 export const KEY_RE = /^[a-z0-9][a-z0-9:-]{0,79}$/;

@@ -1,46 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 const LEN = 4;
-const NAME_KEY = "foodprep:name";
 
 export function Login() {
   const router = useRouter();
-  const [name, setName] = useState("");
   const [pin, setPin] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [shake, setShake] = useState(false);
   const pinInput = useRef<HTMLInputElement>(null);
-  const nameInput = useRef<HTMLInputElement>(null);
-
-  // Remember the name on this device so the next sign-in is just four taps.
-  useEffect(() => {
-    try {
-      const n = localStorage.getItem(NAME_KEY);
-      if (n) setName(n);
-    } catch {
-      /* ignore */
-    }
-  }, []);
 
   async function submit(code: string) {
     if (busy) return;
-    if (!name.trim()) {
-      setErr("Type your name first.");
-      nameInput.current?.focus();
-      setPin("");
-      return;
-    }
     setBusy(true);
     setErr(null);
     try {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), pin: code }),
+        body: JSON.stringify({ pin: code }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -49,11 +30,6 @@ export function Login() {
         setShake(true);
         setTimeout(() => setShake(false), 500);
         return;
-      }
-      try {
-        localStorage.setItem(NAME_KEY, name.trim());
-      } catch {
-        /* ignore */
       }
       router.refresh();
     } catch {
@@ -92,24 +68,10 @@ export function Login() {
         <div>
           <h1>The October Freezer</h1>
           <p className="muted" style={{ marginTop: 6 }}>
-            Sign in once on each device. Ticks you make show up on the other one.
+            Enter the household PIN once on each device. Ticks sync between them.
           </p>
         </div>
 
-        <label>
-          Your name
-          <input
-            ref={nameInput}
-            name="name"
-            autoComplete="given-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            maxLength={24}
-            required
-            placeholder="Nick"
-            enterKeyHint="next"
-          />
-        </label>
 
         <div className="pinblock">
           <div className="pinhead">

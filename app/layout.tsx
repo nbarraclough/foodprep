@@ -46,7 +46,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SyncProvider me={session.name}>
             <KitchenProvider>
               <TimerProvider>
-                <Shell name={session.name}>{children}</Shell>
+                <Shell>{children}</Shell>
               </TimerProvider>
             </KitchenProvider>
           </SyncProvider>

@@ -45,7 +45,7 @@ export async function ticksSince(since: number): Promise<Tick[]> {
   return rows.map(toTick);
 }
 
-export async function setTicks(changes: { key: string; on: boolean }[], who: string): Promise<Tick[]> {
+export async function setTicks(changes: { key: string; on: boolean }[], who: string | null): Promise<Tick[]> {
   await ensureSchema();
   const sql = conn();
   const ts = Date.now();

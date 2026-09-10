@@ -41,6 +41,6 @@ export async function PATCH(req: Request) {
     }
     changes.push({ key, on });
   }
-  const ticks = await setTicks(changes, session.name);
+  const ticks = await setTicks(changes, session.name || null);
   return NextResponse.json({ ticks, now: Date.now() }, { headers: noStore });
 }

@@ -143,16 +143,6 @@ export function After({ r }: { r: Recipe }) {
           {nt[1]}
         </div>
       ))}
-      {r.audit && r.audit.length > 0 && (
-        <div className="note audit">
-          <b>Checked in the audit</b>
-          <ul>
-            {r.audit.map((a, i) => (
-              <li key={i}>{a}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

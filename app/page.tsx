@@ -32,6 +32,9 @@ export default function PlanPage() {
           <Link className="btn" href="/recipes">
             Find a recipe
           </Link>
+          <Link className="btn quiet" href="/print">
+            Print
+          </Link>
         </div>
       </div>
 

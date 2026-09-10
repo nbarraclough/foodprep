@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { allShopKeys, SHOP, shopKey, storeShopKeys } from "@/lib/data";
 import { Check } from "./Check";
@@ -47,6 +48,9 @@ export function Shopping() {
         <button type="button" className={`btn quiet ${confirm ? "primary" : ""}`} onClick={clearAll} disabled={done === 0}>
           {confirm ? "Tap again to clear all ticks" : "Clear ticks"}
         </button>
+        <Link className="btn" href={`/print?sections=shopping&unbought=1${store === "all" ? "" : `&stores=${encodeURIComponent(store)}`}`}>
+          Print what is left
+        </Link>
       </div>
 
       <p className="muted small num" style={{ marginBottom: 6 }}>
